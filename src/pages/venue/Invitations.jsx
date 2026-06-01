@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import api from "../../api/client";
+import api, { shareLink } from "../../api/client";
 import { Layout, Modal } from "../../components/UI";
 import FloatingHearts from "../../components/FloatingHearts";
 import { uploadFile, firebaseReady } from "../../api/firebase";
@@ -104,7 +104,7 @@ export default function Invitations() {
   };
 
   const copyLink = (inv) => {
-    const url = `${window.location.origin}/i/${inv._id}`;
+    const url = shareLink(inv._id);
     navigator.clipboard.writeText(url);
     alert("Havola nusxalandi:\n" + url);
   };
