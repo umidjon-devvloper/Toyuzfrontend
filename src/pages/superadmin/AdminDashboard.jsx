@@ -5,7 +5,7 @@ import {
 } from "recharts";
 import api from "../../api/client";
 import { Layout, fmt, monthName } from "../../components/UI";
-import { Building2, CheckCircle2, Mails, Wallet, Plus, Users } from "lucide-react";
+import { Building2, CheckCircle2, Mails, Wallet, Plus, Users, CalendarHeart, Send } from "lucide-react";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -26,22 +26,28 @@ export default function AdminDashboard() {
     <Layout title="Boshqaruv paneli">
       <div className="stat-grid">
         <div className="stat-card">
+          <div className="ic"><Mails size={20} /></div>
+          <span className="value">{stats?.totalInvitations ?? "—"}</span>
+          <span className="label">Umumiy taklifnomalar</span>
+          <span className="sub">Jami yaratilgan</span>
+        </div>
+        <div className="stat-card">
+          <div className="ic"><Send size={20} /></div>
+          <span className="value">{stats?.totalSent ?? "—"}</span>
+          <span className="label">Yuborilgan taklifnomalar</span>
+          <span className="sub">Hisobga olingan</span>
+        </div>
+        <div className="stat-card">
+          <div className="ic"><CalendarHeart size={20} /></div>
+          <span className="value">{stats?.finishedWeddings ?? "—"}</span>
+          <span className="label">Tugagan to'ylar</span>
+          <span className="sub">Sanasi o'tgan</span>
+        </div>
+        <div className="stat-card">
           <div className="ic"><Building2 size={20} /></div>
           <span className="value">{stats?.totalVenues ?? "—"}</span>
           <span className="label">To'yxonalar</span>
-          <span className="sub">Jami ro'yxatdan o'tgan</span>
-        </div>
-        <div className="stat-card">
-          <div className="ic"><CheckCircle2 size={20} /></div>
-          <span className="value">{stats?.activeVenues ?? "—"}</span>
-          <span className="label">Aktiv to'yxonalar</span>
-          <span className="sub">Hozirda ishlayotgan</span>
-        </div>
-        <div className="stat-card">
-          <div className="ic"><Mails size={20} /></div>
-          <span className="value">{stats?.totalSent ?? "—"}</span>
-          <span className="label">Yuborilgan taklifnomalar</span>
-          <span className="sub">Jami hisoblangan</span>
+          <span className="sub">{stats?.activeVenues ?? "—"} ta aktiv</span>
         </div>
         <div className="stat-card">
           <div className="ic"><Wallet size={20} /></div>
@@ -49,7 +55,7 @@ export default function AdminDashboard() {
             {fmt(stats?.totalDebt)}
           </span>
           <span className="label">Umumiy qarz (so'm)</span>
-          <span className="sub">To'lanmagan summa</span>
+          <span className="sub">Oylik to'lanmagan + tuzatma</span>
         </div>
       </div>
 

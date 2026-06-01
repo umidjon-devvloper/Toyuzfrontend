@@ -53,10 +53,18 @@ body{font-family:'Inter',system-ui,sans-serif;}
 .toy-cd-box{min-width:64px;padding:12px 10px;border-radius:14px;background:rgba(0,0,0,.06);text-align:center;}
 .toy-cd-num{font-size:28px;font-weight:700;line-height:1;}
 .toy-cd-lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.7;margin-top:6px;}
-[data-toy="gallery"].toy-gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
-.toy-gimg{display:block;border-radius:14px;overflow:hidden;aspect-ratio:1;}
-.toy-gimg img{width:100%;height:100%;object-fit:cover;}
+/* Galereya — markazdan boshlanadigan gorizontal karusel (snap bilan) */
+[data-toy="gallery"].toy-gallery{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:6px 50%;scrollbar-width:none;}
+[data-toy="gallery"].toy-gallery::-webkit-scrollbar{display:none;}
+.toy-gimg{flex:0 0 auto;width:76%;max-width:340px;scroll-snap-align:center;border-radius:18px;overflow:hidden;aspect-ratio:4/5;box-shadow:0 12px 30px -10px rgba(0,0,0,.35);}
+.toy-gimg img{width:100%;height:100%;object-fit:cover;display:block;}
 .toy-map-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;background:#b08d57;color:#fff;text-decoration:none;font-weight:600;}
+/* Iframe ichidagi musiqa tugmasi */
+.toy-music-btn{position:fixed;right:16px;bottom:16px;z-index:2147483000;width:46px;height:46px;border-radius:999px;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(20,16,10,.55);color:#fff;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.3);transition:transform .15s;}
+.toy-music-btn:hover{transform:scale(1.08);}
+.toy-music-btn svg{width:22px;height:22px;}
+.toy-music-btn.playing{animation:toySpin 6s linear infinite;}
+@keyframes toySpin{to{transform:rotate(360deg);}}
 `;
 
 // Iframe ichida ishlaydigan runtime: cover/gallery/map/countdown widget'larini to'ldiradi
@@ -69,6 +77,12 @@ const RUNTIME = `
   q('[data-toy="gallery"]').forEach(function(el){
     el.classList.add('toy-gallery');
     el.innerHTML = imgs.map(function(u){return '<a class="toy-gimg" href="'+u+'" target="_blank" rel="noreferrer"><img loading="lazy" src="'+u+'" alt=""></a>';}).join('');
+    // Galereya markazdan boshlanadi (o'rtadagi rasm ko'rinadi)
+    requestAnimationFrame(function(){
+      var mid = Math.floor(imgs.length/2);
+      var item = el.children[mid];
+      if(item){ el.scrollLeft = item.offsetLeft - (el.clientWidth/2) + (item.clientWidth/2); }
+    });
   });
   q('[data-toy="map"]').forEach(function(el){
     if(D.mapLink){ el.innerHTML = '<a class="toy-map-btn" href="'+D.mapLink+'" target="_blank" rel="noreferrer">📍 Xaritada ochish</a>'; }
@@ -86,6 +100,35 @@ const RUNTIME = `
     }
     tick(); setInterval(tick,1000);
   }
+
+  // ===== MUSIQA — ochilishi bilan avtomatik ijro (iframe ichida ishonchli) =====
+  if(D.music){
+    // Dizayn ichidagi boshqa audio bo'lsa — to'xtatamiz (ikki marta ijro bo'lmasligi uchun)
+    q('audio').forEach(function(a){ try{a.pause();}catch(e){} });
+    var audio = new Audio(D.music);
+    audio.loop = true;
+    var playing = false;
+    var btn = document.createElement('button');
+    btn.className = 'toy-music-btn';
+    btn.setAttribute('aria-label','Musiqa');
+    var ICON_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+    var ICON_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
+    function render(){ btn.innerHTML = playing ? ICON_ON : ICON_OFF; btn.classList.toggle('playing', playing); }
+    function start(){ audio.play().then(function(){ playing=true; render(); }).catch(function(){}); }
+    function toggle(){ if(playing){ audio.pause(); playing=false; render(); } else { start(); } }
+    audio.addEventListener('pause', function(){ playing=false; render(); });
+    audio.addEventListener('play', function(){ playing=true; render(); });
+    btn.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
+    render();
+    document.body.appendChild(btn);
+
+    // 1) Darhol urinib ko'ramiz (Telegram WebView / oldin ruxsat berilgan bo'lsa ishlaydi)
+    start();
+    // 2) Aks holda — birinchi teginishda (iframe ichida) ishga tushadi
+    var unlock = function(){ if(!playing){ start(); } if(playing){ off(); } };
+    var off = function(){ ['pointerdown','touchstart','click','keydown','scroll'].forEach(function(ev){ document.removeEventListener(ev, unlock, true); }); };
+    ['pointerdown','touchstart','click','keydown','scroll'].forEach(function(ev){ document.addEventListener(ev, unlock, true); });
+  }
 })();
 `;
 
@@ -98,6 +141,7 @@ export function buildPreviewDoc(design, inv) {
     images: inv.images || [],
     mapLink: inv.mapLink || "",
     target: computeTarget(inv.weddingDate, inv.weddingTime),
+    music: inv.music?.url || "",
   };
   // </script> ni JSON ichida buzilmasligi uchun ehtiyot chorasi
   const dataJson = JSON.stringify(runtimeData).replace(/</g, "\\u003c");

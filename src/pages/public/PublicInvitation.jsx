@@ -2,9 +2,47 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../api/client";
 import { buildPreviewDoc, computeTarget } from "../../lib/design";
-import { Frown, Play, Pause, CalendarDays, Clock, MapPin, Navigation } from "lucide-react";
+import { Frown, Music, CalendarDays, Clock, MapPin, Navigation } from "lucide-react";
 
-// Dizaynsiz taklifnoma uchun oddiy zaxira ko'rinish (countdown bilan)
+// ===== SEO: sahifa meta teglarini dinamik to'ldirish =====
+function setMeta(attr, key, content) {
+  let el = document.head.querySelector(`meta[${attr}="${key}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content || "");
+}
+function applySeo(inv) {
+  const title = `${inv.groomName} & ${inv.brideName} — To'y taklifnomasi`;
+  const dateStr = inv.weddingDate
+    ? new Date(inv.weddingDate).toLocaleDateString("uz-UZ", { day: "numeric", month: "long", year: "numeric" })
+    : "";
+  const place = inv.venueName || inv.address || "";
+  const desc = [dateStr, inv.weddingTime, place].filter(Boolean).join(" • ") || "Sizni to'yimizga taklif qilamiz!";
+  const image = inv.images?.[0] || inv.design?.preview || "";
+  const url = window.location.href;
+
+  document.title = title;
+  document.documentElement.lang = "uz";
+  setMeta("name", "description", desc);
+  setMeta("property", "og:type", "website");
+  setMeta("property", "og:site_name", "TOY.UZ");
+  setMeta("property", "og:title", title);
+  setMeta("property", "og:description", desc);
+  setMeta("property", "og:url", url);
+  if (image) setMeta("property", "og:image", image);
+  setMeta("name", "twitter:card", image ? "summary_large_image" : "summary");
+  setMeta("name", "twitter:title", title);
+  setMeta("name", "twitter:description", desc);
+  if (image) setMeta("name", "twitter:image", image);
+  // canonical
+  let link = document.head.querySelector('link[rel="canonical"]');
+  if (!link) { link = document.createElement("link"); link.rel = "canonical"; document.head.appendChild(link); }
+  link.href = url;
+}
+
 function useCountdown(target) {
   const [t, setT] = useState({ d: 0, h: 0, m: 0, s: 0 });
   useEffect(() => {
@@ -82,10 +120,24 @@ export default function PublicInvitation() {
   }, [id]);
 
   useEffect(() => {
-    if (inv) document.title = `${inv.groomName} & ${inv.brideName} — TOY.UZ`;
+    if (inv) applySeo(inv);
   }, [inv]);
 
   const doc = useMemo(() => (inv?.design ? buildPreviewDoc(inv.design, inv) : null), [inv]);
+
+  // Fallback (dizaynsiz) holatda musiqa avtomatik ijro — dizaynli holatda iframe ichida boshqariladi
+  useEffect(() => {
+    if (!inv || inv.design || !inv.music?.url) return;
+    const a = audioRef.current;
+    if (!a) return;
+    const start = () => a.play().then(() => setPlaying(true)).catch(() => {});
+    start();
+    const unlock = () => { start(); cleanup(); };
+    const events = ["pointerdown", "touchstart", "click", "keydown", "scroll"];
+    events.forEach((e) => document.addEventListener(e, unlock, { once: false, capture: true }));
+    const cleanup = () => events.forEach((e) => document.removeEventListener(e, unlock, true));
+    return cleanup;
+  }, [inv]);
 
   const toggleMusic = () => {
     const a = audioRef.current;
@@ -103,20 +155,23 @@ export default function PublicInvitation() {
 
   return (
     <div className="pub-stage">
-      {inv.design ? (
-        <iframe title="taklifnoma" className="pub-frame" srcDoc={doc} sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" />
-      ) : (
-        <FallbackInvitation inv={inv} />
-      )}
-
-      {inv.music?.url && (
-        <>
-          <audio ref={audioRef} src={inv.music.url} loop onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
-          <button className="pub-music-btn" onClick={toggleMusic} title={inv.music.name || "Musiqa"}>
-            {playing ? <Pause size={20} /> : <Play size={20} />}
-          </button>
-        </>
-      )}
+      <div className="pub-phone">
+        {inv.design ? (
+          <iframe title="taklifnoma" className="pub-frame" srcDoc={doc} sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" />
+        ) : (
+          <div className="pub-scroll">
+            <FallbackInvitation inv={inv} />
+            {inv.music?.url && (
+              <>
+                <audio ref={audioRef} src={inv.music.url} loop onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
+                <button className={`pub-music-btn ${playing ? "playing" : ""}`} onClick={toggleMusic} title={inv.music.name || "Musiqa"}>
+                  <Music size={20} />
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
