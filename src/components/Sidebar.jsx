@@ -2,13 +2,15 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
 import {
-  LayoutDashboard, Inbox, Building2, Wallet, Mails, LogOut,
+  LayoutDashboard, Inbox, Building2, Wallet, Mails, LogOut, Palette, Music2,
 } from "lucide-react";
 
 const superAdminLinks = [
   { to: "/admin", label: "Boshqaruv", Icon: LayoutDashboard, end: true },
   { to: "/admin/inbox", label: "Oqim", Icon: Inbox, badge: "pending" },
   { to: "/admin/venues", label: "To'yxonalar", Icon: Building2 },
+  { to: "/admin/designs", label: "Dizaynlar", Icon: Palette },
+  { to: "/admin/music", label: "Musiqa", Icon: Music2 },
   { to: "/admin/billing", label: "Hisob", Icon: Wallet },
 ];
 

@@ -8,6 +8,9 @@ import AdminDashboard from "./pages/superadmin/AdminDashboard";
 import Venues from "./pages/superadmin/Venues";
 import Billing from "./pages/superadmin/Billing";
 import Inbox from "./pages/superadmin/Inbox";
+import Designs from "./pages/superadmin/Designs";
+import Music from "./pages/superadmin/Music";
+import EditInvitation from "./pages/superadmin/EditInvitation";
 import VenueDashboard from "./pages/venue/VenueDashboard";
 import Invitations from "./pages/venue/Invitations";
 import PublicInvitation from "./pages/public/PublicInvitation";
@@ -71,6 +74,9 @@ function AppRoutes() {
       <Route path="/admin" element={<ProtectedRoute role="super_admin"><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/inbox" element={<ProtectedRoute role="super_admin"><Inbox /></ProtectedRoute>} />
       <Route path="/admin/venues" element={<ProtectedRoute role="super_admin"><Venues /></ProtectedRoute>} />
+      <Route path="/admin/designs" element={<ProtectedRoute role="super_admin"><Designs /></ProtectedRoute>} />
+      <Route path="/admin/music" element={<ProtectedRoute role="super_admin"><Music /></ProtectedRoute>} />
+      <Route path="/admin/invitations/:id" element={<ProtectedRoute role="super_admin"><EditInvitation /></ProtectedRoute>} />
       <Route path="/admin/billing" element={<ProtectedRoute role="super_admin"><Billing /></ProtectedRoute>} />
 
       {/* Venue Admin */}

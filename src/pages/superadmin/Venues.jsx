@@ -8,7 +8,7 @@ import {
 
 const emptyForm = {
   name: "", login: "", password: "", pricePerInvitation: 200000,
-  phone: "", address: "", status: "active", telegramChatId: "",
+  phone: "", address: "", mapLink: "", status: "active", telegramChatId: "",
 };
 
 export default function Venues() {
@@ -37,7 +37,7 @@ export default function Venues() {
     setForm({
       name: v.name, login: v.admin?.login || "", password: "",
       pricePerInvitation: v.pricePerInvitation, phone: v.phone || "",
-      address: v.address || "", status: v.status, telegramChatId: v.telegramChatId || "",
+      address: v.address || "", mapLink: v.mapLink || "", status: v.status, telegramChatId: v.telegramChatId || "",
     });
     setCreatedPass(null); setError(""); setModal(true);
   };
@@ -54,7 +54,7 @@ export default function Venues() {
       if (editing) {
         await api.put(`/admin/venues/${editing._id}`, {
           name: form.name, pricePerInvitation: Number(form.pricePerInvitation),
-          phone: form.phone, address: form.address, status: form.status,
+          phone: form.phone, address: form.address, mapLink: form.mapLink, status: form.status,
           newPassword: form.password || undefined, telegramChatId: form.telegramChatId,
         });
         setModal(false); load();
@@ -199,8 +199,14 @@ export default function Venues() {
                 </div>
               </div>
               <div className="form-group">
-                <label>Manzil</label>
-                <input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+                <label>Lokatsiya nomi / manzil</label>
+                <input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  placeholder="Masalan: Toshkent sh., Chilonzor t." />
+              </div>
+              <div className="form-group">
+                <label>Lokatsiya (Google karta havolasi)</label>
+                <input value={form.mapLink} onChange={(e) => setForm({ ...form, mapLink: e.target.value })}
+                  placeholder="https://maps.google.com/..." />
               </div>
               {editing && (
                 <div className="form-group">

@@ -21,8 +21,8 @@ if (isConfigured) {
 
 export const firebaseReady = isConfigured;
 
-// Rasmni Firebase Storage ga yuklab, yuklab olish URL ini qaytaradi
-export const uploadImage = async (file, folder = "invitations") => {
+// Faylni Firebase Storage ga yuklab, yuklab olish URL ini qaytaradi (rasm, audio va h.k.)
+export const uploadFile = async (file, folder = "invitations") => {
   if (!storage) {
     throw new Error("Firebase sozlanmagan. .env dagi VITE_FIREBASE_* qiymatlarini to'ldiring.");
   }
@@ -34,3 +34,6 @@ export const uploadImage = async (file, folder = "invitations") => {
   await uploadBytes(storageRef, file);
   return await getDownloadURL(storageRef);
 };
+
+// Orqaga moslik uchun nom (rasm yuklash)
+export const uploadImage = (file, folder = "invitations") => uploadFile(file, folder);

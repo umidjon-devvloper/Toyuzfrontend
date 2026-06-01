@@ -9,7 +9,7 @@ export default defineConfig({
     // ngrok / cloudflared kabi tunnel domenlariga ruxsat (dev uchun hammasi)
     allowedHosts: true,
     proxy: {
-      "/api": "http://localhost:8000",
+      "/api": "https://noncondensable-distemperedly-tameka.ngrok-free.dev",
     },
   },
 });

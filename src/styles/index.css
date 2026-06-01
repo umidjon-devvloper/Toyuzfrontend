@@ -619,3 +619,47 @@ tr:last-child td { border-bottom: none; }
 }
 .tg-text { font-size: 16px; font-weight: 600; }
 .tg-sub { font-size: 13.5px; opacity: 0.9; max-width: 320px; line-height: 1.5; }
+
+/* ====== DIZAYNLAR (superadmin) ====== */
+.form-note { font-size: 13px; color: var(--text-muted); background: #f6f4ff; border: 1px solid #ece8ff; padding: 10px 12px; border-radius: 10px; }
+.code-area { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12.5px; line-height: 1.5; white-space: pre; }
+.placeholder-help { background: #f7f6fb; border: 1px solid #eceaf5; border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; font-size: 12.5px; color: var(--text-muted); }
+.placeholder-help code { display: block; background: #fff; border: 1px solid #ece8ff; border-radius: 8px; padding: 7px 10px; margin-top: 4px; font-size: 12px; color: #6d4aff; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+.design-preview-frame { width: 100%; height: 460px; border: 1px solid var(--border); border-radius: 12px; margin-top: 8px; background: #fff; }
+
+.design-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.design-card { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #fff; }
+.design-thumb { position: relative; height: 150px; background: var(--primary-light); }
+.design-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.design-thumb-empty { height: 100%; display: flex; align-items: center; justify-content: center; color: var(--primary); opacity: .5; }
+.design-body { padding: 12px 14px; }
+.design-name { font-weight: 700; }
+.design-key { font-size: 12px; color: var(--text-muted); margin: 2px 0 8px; }
+
+/* ====== DIZAYN TANLASH (to'yxona wizard) ====== */
+.design-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+.design-pick-card { border: 2px solid var(--border); background: #fff; border-radius: 12px; overflow: hidden; cursor: pointer; padding: 0; text-align: left; transition: .15s; }
+.design-pick-card.selected { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(109,74,255,.15); }
+.design-pick-thumb { position: relative; height: 120px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: var(--primary); }
+.design-pick-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.design-pick-check { position: absolute; top: 6px; right: 6px; background: var(--primary); color: #fff; border-radius: 999px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
+.design-pick-name { padding: 8px 10px; font-size: 13px; font-weight: 600; }
+
+/* ====== MUSIQA TANLASH ====== */
+.music-pick { display: flex; flex-direction: column; gap: 8px; }
+.music-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; background: #fff; text-align: left; }
+.music-row.selected { border-color: var(--primary); background: var(--primary-light); }
+.music-row-name { flex: 1; font-weight: 600; font-size: 14px; }
+
+.inv-lock { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-muted); }
+
+/* ====== PUBLIC: dizayn iframe + musiqa tugmasi ====== */
+.pub-stage { position: relative; width: 100%; min-height: 100vh; min-height: 100dvh; background: #faf6ef; }
+.pub-frame { width: 100%; height: 100vh; height: 100dvh; border: 0; display: block; }
+.pub-music-btn {
+  position: fixed; right: 16px; bottom: 16px; z-index: 50;
+  width: 52px; height: 52px; border-radius: 999px; border: none; cursor: pointer;
+  background: #b08d57; color: #fff; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,.25);
+}
+.pub-music-btn:hover { filter: brightness(1.05); }

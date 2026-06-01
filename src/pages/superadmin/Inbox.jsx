@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/client";
 import { Layout, fmt } from "../../components/UI";
 import { useSocket } from "../../context/SocketContext";
 import {
   Clock, CheckCircle2, XCircle, ListChecks, Radio, Building2,
-  CalendarDays, MapPin, Wallet, FileText, Check, X, Bell,
+  CalendarDays, MapPin, Wallet, FileText, Check, X, Bell, Pencil,
 } from "lucide-react";
 
 const TABS = [
@@ -55,6 +56,7 @@ export default function Inbox() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const { lastEvent, setPendingCount } = useSocket();
+  const navigate = useNavigate();
 
   const load = useCallback(
     (showLoad = true) => {
@@ -187,16 +189,21 @@ export default function Inbox() {
                   <div className="reject-reason">Sabab: {inv.rejectReason}</div>
                 )}
 
-                {inv.acceptStatus === "pending" && (
-                  <div className="ic-actions">
-                    <button className="btn btn-primary btn-sm" disabled={busy === inv._id} onClick={() => accept(inv)}>
-                      <Check size={15} /> {busy === inv._id ? "..." : "Qabul qilish"}
-                    </button>
-                    <button className="btn btn-ghost btn-sm" disabled={busy === inv._id} onClick={() => reject(inv)}>
-                      <X size={15} /> Rad etish
-                    </button>
-                  </div>
-                )}
+                <div className="ic-actions">
+                  {inv.acceptStatus === "pending" && (
+                    <>
+                      <button className="btn btn-primary btn-sm" disabled={busy === inv._id} onClick={() => accept(inv)}>
+                        <Check size={15} /> {busy === inv._id ? "..." : "Qabul qilish"}
+                      </button>
+                      <button className="btn btn-ghost btn-sm" disabled={busy === inv._id} onClick={() => reject(inv)}>
+                        <X size={15} /> Rad etish
+                      </button>
+                    </>
+                  )}
+                  <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/admin/invitations/${inv._id}`)} title="To'liq tahrirlash">
+                    <Pencil size={15} /> Tahrirlash
+                  </button>
+                </div>
               </div>
             ))}
           </div>
