@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api/client";
 import { Layout } from "../../components/UI";
 import FloatingHearts from "../../components/FloatingHearts";
-import { Mails, Send, CalendarHeart, Plus, Heart, Sparkles, ArrowRight, MapPin } from "lucide-react";
+import { Mails, CalendarHeart, CheckCircle2, Plus, Heart, Sparkles, ArrowRight, MapPin } from "lucide-react";
 
 const isUpcoming = (d) => new Date(d) >= new Date(new Date().toDateString());
 
@@ -17,13 +17,13 @@ export default function VenueDashboard() {
     api.get("/venue/invitations").then((r) => setList(r.data)).catch(() => {});
   }, []);
 
-  const upcoming = list.filter((i) => isUpcoming(i.weddingDate)).length;
+  const finished = list.filter((i) => !isUpcoming(i.weddingDate)).length;
   const recent = list.slice(0, 5);
 
   const cards = [
     { Icon: Mails, label: "Jami taklifnomalar", value: stats?.total, sub: "Yaratilgan", grad: "from-gold-400 to-gold-600" },
-    { Icon: Send, label: "Yuborilgan", value: stats?.sent, sub: "Hisobga olingan", grad: "from-rose-400 to-rose-600" },
-    { Icon: CalendarHeart, label: "Yaqin to'ylar", value: upcoming, sub: "Oldinda kutilmoqda", grad: "from-amber-400 to-orange-500" },
+    { Icon: CalendarHeart, label: "Umumiy to'ylar", value: list.length, sub: "Barcha to'ylar", grad: "from-rose-400 to-rose-600" },
+    { Icon: CheckCircle2, label: "Tugagan to'ylar", value: finished, sub: "O'tib bo'lgan", grad: "from-emerald-400 to-emerald-600" },
   ];
 
   return (

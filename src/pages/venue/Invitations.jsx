@@ -2,16 +2,15 @@ import { useEffect, useState, useRef } from "react";
 import api, { shareLink } from "../../api/client";
 import { Layout, Modal } from "../../components/UI";
 import FloatingHearts from "../../components/FloatingHearts";
-import { uploadFile, firebaseReady } from "../../api/firebase";
 import {
-  Plus, Pencil, Link2, UploadCloud, X, Heart, MapPin, CalendarDays,
+  Plus, Pencil, Link2, Heart, MapPin, CalendarDays,
   ArrowLeft, ArrowRight, Check, Palette, Image as ImgIcon,
-  Loader2, AlertTriangle, Music2, Play, Pause, Lock, Send, Sparkles, CheckCircle2,
+  AlertTriangle, Music2, Play, Pause, Lock, Send, Sparkles, CheckCircle2,
 } from "lucide-react";
 
 const emptyForm = {
   groomName: "", brideName: "", weddingDate: "", weddingTime: "18:00",
-  description: "", design: "", music: "", images: [],
+  description: "", design: "", music: "",
 };
 
 const DESC_EXAMPLE =
@@ -32,13 +31,11 @@ export default function Invitations() {
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [step, setStep] = useState(1);
-  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [sent, setSent] = useState(false); // yuborilgandan keyingi tabrik ekrani
   // Yuborilgan taklifnoma uchun cheklangan tahrir (faqat ism + soat)
   const [sentEdit, setSentEdit] = useState(null);
   const [previewMusic, setPreviewMusic] = useState(null);
-  const fileRef = useRef(null);
   const audioRef = useRef(null);
 
   const load = () => {
@@ -53,25 +50,6 @@ export default function Invitations() {
 
   const openCreate = () => { setForm(emptyForm); setStep(1); setSent(false); setModal(true); };
   const set = (k, v) => setForm((s) => ({ ...s, [k]: v }));
-
-  const onPickFiles = async (e) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
-    if (!firebaseReady) { alert("Firebase sozlanmagan. .env (VITE_FIREBASE_*) ni to'ldiring."); return; }
-    setUploading(true);
-    try {
-      const urls = [];
-      for (const f of files) urls.push(await uploadFile(f));
-      setForm((s) => ({ ...s, images: [...s.images, ...urls] }));
-    } catch (err) {
-      alert("Rasm yuklashda xato: " + err.message);
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
-  };
-
-  const removeImage = (url) => setForm((s) => ({ ...s, images: s.images.filter((u) => u !== url) }));
 
   const canNext = () => {
     if (step === 1) return form.groomName && form.brideName && form.weddingDate;
@@ -297,35 +275,13 @@ export default function Invitations() {
                 </div>
               )}
 
-              {/* 4: Rasm + yuborish */}
+              {/* 4: Yuborish */}
               {step === 4 && (
                 <div className="wiz-panel">
-                  <div className="wiz-head"><ImgIcon size={17} /> Rasm va yuborish</div>
-                  <div className="wiz-sub">Rasm yuklang, ma'lumotlarni tekshiring va yuboring</div>
+                  <div className="wiz-head"><Send size={17} /> Yuborish</div>
+                  <div className="wiz-sub">Ma'lumotlarni tekshiring va yuboring</div>
 
-                  <div className="dropzone" onClick={() => !uploading && fileRef.current?.click()}>
-                    <div className="dz-ic"><UploadCloud size={24} /></div>
-                    {uploading ? (
-                      <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Loader2 size={16} className="spin" /> Yuklanmoqda...</div>
-                    ) : (
-                      <><div className="dz-title">Rasm tanlash</div><div className="dz-hint">Telefon/galereya • bir nechta bo'lishi mumkin</div></>
-                    )}
-                    <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={onPickFiles} />
-                  </div>
-                  {!firebaseReady && <span className="hint-warn" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AlertTriangle size={13} /> Firebase sozlanmagan (.env)</span>}
-
-                  {form.images.length > 0 && (
-                    <div className="thumb-grid">
-                      {form.images.map((url) => (
-                        <div key={url} className="thumb">
-                          <img src={url} alt="" />
-                          <button type="button" className="thumb-x" onClick={() => removeImage(url)}><X size={14} /></button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="form-group" style={{ marginTop: 14 }}>
+                  <div className="form-group">
                     <label>Qisqa matn (ixtiyoriy)</label>
                     <textarea rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder={DESC_EXAMPLE} />
                   </div>
@@ -335,7 +291,6 @@ export default function Invitations() {
                     <div className="review-row"><span className="rk"><CalendarDays size={14} /> Sana</span><span className="rv">{fmtDate(form.weddingDate)} • {form.weddingTime}</span></div>
                     <div className="review-row"><span className="rk"><Palette size={14} /> Dizayn</span><span className="rv">{designName(form.design)}</span></div>
                     <div className="review-row"><span className="rk"><Music2 size={14} /> Musiqa</span><span className="rv">{form.music ? musicName(form.music) : "Musiqasiz"}</span></div>
-                    <div className="review-row"><span className="rk"><ImgIcon size={14} /> Rasmlar</span><span className="rv">{form.images.length} ta</span></div>
                   </div>
                 </div>
               )}
@@ -346,7 +301,7 @@ export default function Invitations() {
                   : <button className="btn btn-ghost" onClick={() => setModal(false)}>Bekor qilish</button>}
                 {step < 4
                   ? <button className="btn btn-primary" onClick={next}>Keyingi <ArrowRight size={16} /></button>
-                  : <button className="btn btn-primary" onClick={submit} disabled={saving || uploading}>
+                  : <button className="btn btn-primary" onClick={submit} disabled={saving}>
                       <Send size={16} /> {saving ? "Yuborilmoqda..." : "Yuborish"}
                     </button>}
               </div>

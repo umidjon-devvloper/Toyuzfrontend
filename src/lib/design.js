@@ -75,6 +75,8 @@ const RUNTIME = `
   function q(sel){return Array.prototype.slice.call(document.querySelectorAll(sel));}
   q('[data-toy="cover"]').forEach(function(el){ if(imgs[0]){ el.style.backgroundImage='url("'+imgs[0]+'")'; el.classList.add('toy-cover'); }});
   q('[data-toy="gallery"]').forEach(function(el){
+    // Rasm yo'q — "Xotira lavhalari" bo'limini butunlay yashiramiz
+    if(!imgs.length){ var sec = el.closest('.sec'); (sec || el).style.display='none'; return; }
     el.classList.add('toy-gallery');
     el.innerHTML = imgs.map(function(u){return '<a class="toy-gimg" href="'+u+'" target="_blank" rel="noreferrer"><img loading="lazy" src="'+u+'" alt=""></a>';}).join('');
     // Galereya markazdan boshlanadi (o'rtadagi rasm ko'rinadi)

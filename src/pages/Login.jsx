@@ -1,14 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, clearSession } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ login: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
+
+  // Login sahifasi ochilganda eski sessiyani tozalaymiz —
+  // shunda boshqa login/parol bilan kirilganda avvalgi panel ochilib qolmaydi.
+  useEffect(() => {
+    clearSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const submit = async () => {
     setError("");

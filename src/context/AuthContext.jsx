@@ -26,15 +26,20 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const logout = () => {
+  // Sessiyani tozalash (yo'naltirishsiz) — login sahifasi shuni ishlatadi
+  const clearSession = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
+  };
+
+  const logout = () => {
+    clearSession();
     window.location.href = "/login";
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, telegramLogin, logout }}>
+    <AuthContext.Provider value={{ user, login, telegramLogin, logout, clearSession }}>
       {children}
     </AuthContext.Provider>
   );
